@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobio - Proyecto Capstone DuocUC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%);
+            overflow: hidden;
+            animation: gradientShift 15s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            transform: translateX(0);
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide.active > * {
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+        }
+
+        .slide.active > *:nth-child(1) { animation-delay: 0.1s; }
+        .slide.active > *:nth-child(2) { animation-delay: 0.2s; }
+        .slide.active > *:nth-child(3) { animation-delay: 0.3s; }
+        .slide.active > *:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .duoc-logo {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            width: 140px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: float 3s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .duoc-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 25px;
+            right: 35px;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 12px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 4.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 800;
+            letter-spacing: -2px;
+            text-shadow: 0 0 80px rgba(30, 58, 138, 0.3);
+        }
+
+        h2 {
+            color: #1e40af;
+            font-size: 3rem;
+            margin-bottom: 40px;
+            text-align: center;
+            font-weight: 700;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #1e40af, #3b82f6);
+            border-radius: 2px;
+        }
+
+        h3 {
+            color: #1e293b;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        p, li {
+            color: #475569;
+            font-size: 1.25rem;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 35px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .team-member {
+            text-align: center;
+            padding: 35px 25px;
+            background: linear-gradient(145deg, #ffffff, #f1f5f9);
+            border-radius: 20px;
+            border: 2px solid rgba(30, 64, 175, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-member::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #1e40af, #3b82f6);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .team-member:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(30, 64, 175, 0.15);
+        }
+
+        .team-member:hover::before {
+            transform: scaleX(1);
+        }
+
+        .member-avatar {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.2rem;
+            font-weight: bold;
+            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .team-member:hover .member-avatar {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .feature-card {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 5px solid transparent;
+            background-image: linear-gradient(white, white), linear-gradient(180deg, #1e40af, #3b82f6);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #1e40af, #3b82f6, #60a5fa);
+            border-radius: 16px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(30, 64, 175, 0.15);
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .feature-card h4 {
+            color: #1e3a8a;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .tech-item {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            padding: 18px 35px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.25);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tech-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        .tech-item:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(30, 64, 175, 0.35);
+        }
+
+        .tech-item:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .timeline {
+            width: 100%;
+            max-width: 900px;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #1e40af, #60a5fa);
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 35px;
+            align-items: center;
+            position: relative;
+        }
+
+        .timeline-marker {
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            border: 3px solid white;
+            border-radius: 50%;
+            margin-right: 25px;
+            flex-shrink: 0;
+            box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.2);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.2); }
+            50% { box-shadow: 0 0 0 8px rgba(30, 64, 175, 0.1); }
+            100% { box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.2); }
+        }
+
+        .timeline-content {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            padding: 20px 25px;
+            border-radius: 12px;
+            flex-grow: 1;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: translateX(10px);
+            box-shadow: 0 8px 25px rgba(30, 64, 175, 0.15);
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px;
+            border-radius: 35px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.3);
+        }
+
+        .nav-btn:hover:not(:disabled)::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .nav-btn:disabled {
+            background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .problem-highlight {
+            background: linear-gradient(145deg, #fef2f2, #fee2e2);
+            border: 2px solid #fca5a5;
+            padding: 30px;
+            border-radius: 16px;
+            margin: 25px 0;
+            max-width: 850px;
+            box-shadow: 0 10px 25px rgba(252, 165, 165, 0.15);
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .solution-highlight {
+            background: linear-gradient(145deg, #f0fdf4, #dcfce7);
+            border: 2px solid #86efac;
+            padding: 30px;
+            border-radius: 16px;
+            margin: 25px 0;
+            max-width: 850px;
+            box-shadow: 0 10px 25px rgba(134, 239, 172, 0.15);
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .metric-card {
+            text-align: center;
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            padding: 30px 20px;
+            border-radius: 16px;
+            border-top: 4px solid transparent;
+            background-image: linear-gradient(white, white), linear-gradient(90deg, #1e40af, #3b82f6);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(30, 64, 175, 0.2);
+        }
+
+        .metric-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .agenda-list {
+            list-style: none;
+            max-width: 650px;
+            width: 100%;
+        }
+
+        .agenda-list li {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            margin: 12px 0;
+            padding: 18px 25px;
+            border-radius: 12px;
+            border-left: 4px solid transparent;
+            background-image: linear-gradient(white, white), linear-gradient(180deg, #1e40af, #3b82f6);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .agenda-list li:hover {
+            transform: translateX(10px);
+            box-shadow: 0 8px 20px rgba(30, 64, 175, 0.12);
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 50px;
+            font-weight: 500;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-animation {
+            animation: logoReveal 1s ease-out;
+        }
+
+        @keyframes logoReveal {
+            from {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        strong {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .highlight-text {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        
+        <!-- Slide 1: Título -->
+        <div class="slide active">
+            <div class="duoc-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Logo_DuocUC.svg/2560px-Logo_DuocUC.svg.png" alt="DuocUC Logo">
+            </div>
+            <h1 class="logo-animation">JOBIO</h1>
+            <p class="subtitle">Marketplace Digital para Servicios Profesionales</p>
+            <div style="margin-top: 60px;">
+                <h3>Proyecto Capstone - Ingeniería en Informática</h3>
+                <p style="text-align: center; font-size: 1.5rem; font-weight: 600;">
+                    <span class="highlight-text">DuocUC Sede Plaza Norte - 2025</span>
+                </p>
+            </div>
+            <div class="slide-number">1/10</div>
+        </div>
+
+        <!-- Slide 2: Agenda -->
+        <div class="slide">
+            <div class="duoc-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Logo_DuocUC.svg/2560px-Logo_DuocUC.svg.png" alt="DuocUC Logo">
+            </div>
+            <h2>Agenda de Presentación</h2>
+            <ul class="agenda-list">
+                <li>🎯 Problemática Identificada</li>
+                <li>💡 Solución: Jobio Marketplace</li>
+                <li>👥 Presentación del Equipo</li>
+                <li>⚡ Funcionalidades Principales</li>
+                <li>🔧 Arquitectura Técnica</li>
+                <li>📈 Metodología y Cronograma</li>
+                <li>🚀 Impacto Esperado</li>
+                <li>✅ Conclusiones</li>
+            </ul>
+            <div class="slide-number">2/10</div>
+        </div>
+
+        <!-- Slide 3: Problemática -->
+        <div class="slide">
+            <div class="duoc-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Logo_DuocUC.svg/2560px-Logo_DuocUC.svg.png" alt="DuocUC Logo">
+            </div>
+            <h2>Problemática Identificada</h2>
+            <div class="problem-highlight">
+                <h3>¿Qué problema estamos resolviendo?</h3>
+                <p><strong>Para los clientes:</strong> Dificultad para encontrar profesionales confiables para servicios cotidianos (jardinería, gasfitería, pintura, reparación de computadores, etc.)</p>
+                <p><strong>Para los profesionales:</strong> Falta de plataformas digitales seguras y efectivas para llegar a más clientes</p>
+            </div>
+            <p style="text-align: center; font-size: 1.5rem; margin-top: 35px;">
+                <strong class="highlight-text">Necesitamos una solución que conecte de manera confiable y segura a ambas partes</strong>
+            </p>
+            <div class="slide-number">3/10</div>
+        </div>
+
+        <!-- Slide 4: Solución -->
+        <div class="slide">
+            <div class="duoc-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Logo_DuocUC.svg/2560px-Logo_DuocUC.svg.png" alt="DuocUC Logo">
+            </div>
+            <h2>Solución: Jobio Marketplace</h2>
+            <div class="solution-highlight">
+                <h3>Plataforma Web Tipo Marketplace</h3>
+                <p>Conectamos clientes con profesionales de distintos oficios, permitiendo búsqueda, contratación y pago seguro de servicios</p>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-number">🎯</div>
+                    <p><strong>Búsqueda Inteligente</strong><br>Por oficio, ubicación y disponibilidad</p>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">💳</div>
+                    <p><strong>Pagos Seguros</strong><br>Sistema de escrow y split de comisiones</p>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">⭐</div>
+                    <p><strong>Sistema de Confianza</strong><br>Calificaciones y verificación KYC</p>
+                </div>
+            </div>
+            <div class="slide-number">4/10</div>
+        </div>
+
+        <!-- Slide 5: Equipo -->
+        <div class="slide">
+            <div class="duoc-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Logo_DuocUC.svg/2560px-Logo_DuocUC.svg.png" alt="DuocUC Logo">
+            </div>
+            <h2>Nuestro Equipo</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-avatar">M</div>
+                    <h3>María Yeguez</h3>
+                    <p><strong>Experiencia de Usuario</strong></p>
+                    <p>Interfaces intuitivas, diseño centrado en el usuario, accesibilidad web</p>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">J</div>
+                    <h3>Juan Rodrigo González</h3>
+                    <p><strong>Lógica de Negocio</strong></p>
+                    <p>Desarrollo backend, integración de pagos seguros, APIs robustas</p>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">B</div>
+                    <h3>Bladimir Piña</h3>
+                    <p><strong>Infraestructura</strong></p>
+                    <p>Arquitectura cloud, alta disponibilidad, escalabilidad automática</p>
+                </div>
+            </div>
+            <div class="slide-number">5/10</div>
+        </div>
+
+        <!-- Slide 6: Funcionalidades -->
+        <div class="slide">
+            <div class="duoc-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Logo_DuocUC.svg/2560px-Logo_DuocUC.svg.png" alt="DuocUC Logo">
+            </div>
+            <h2>Funcionalidades Principales</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>👤 Para Clientes</h4>
+                    <p>• Búsqueda por oficio y ubicación<br>
+                    • Solicitud de trabajos<br>
+                    • Recepción de ofertas<br>
+                    • Chat en tiempo real<br>
+                    • Sistema de calificaciones</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🔧 Para Profesionales</h4>
+                    <p>• Perfil verificado con KYC<br>
+                    • Configuración de tarifas<br>
+                    • Gestión de disponibilidad<br>
+                    • Dashboard financiero<br>
+                    • Historial de trabajos</p>
+                </div>
+                <div class="feature-card">
+                    <h4>⚡ Características Técnicas</h4>
+                    <p>• PWA (Progressive Web App)<br>
+                    • Notificaciones push<br>
+                    • Pagos con escrow<br>
+                    • Geolocalización<br>
+                    • Chat en tiempo real</p>
+                </div>
+                <div class="feature-card">
+                    <h4>👨‍💼 Panel Administrativo</h4>
+                    <p>• Moderación de usuarios<br>
+                    • Gestión de disputas<br>
+                    • Configuración de comisiones<br>
+                    • Reportes y métricas<br>
+                    • Sistema de soporte</p>
+                </div>
+            </div>
+            <div class="slide-number">6/10</div>
+        </div>
+
+        <!-- Slide 7: Arquitectura -->
+        <div class="slide">
+            <div class="duoc-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Logo_DuocUC.svg/2560px-Logo_DuocUC.svg.png" alt="DuocUC Logo">
+            </div>
+            <h2>Arquitectura Técnica</h2>
+            <h3 style="text-align: center; margin-bottom: 35px;">Stack Tecnológico Profesional</h3>
+            <div class="tech-stack">
+                <div class="tech-item">React</div>
+                <div class="tech-item">Django</div>
+                <div class="tech-item">PostgreSQL</div>
+                <div class="tech-item">AWS / GCP</div>
+                <div class="tech-item">Docker</div>
+            </div>
+            <div style="margin-top: 50px; max-width: 850px;">
+                <h3 style="text-align: center;">Arquitectura Escalable y Moderna</h3>
+                <p style="text-align: center; font-size: 1.3rem;">
+                    • <strong>Frontend Reactivo</strong> con componentes reutilizables<br>
+                    • <strong>Backend Robusto</strong> con Django y APIs REST<br>
+                    • <strong>Base de Datos Confiable</strong> con PostgreSQL<br>
+                    • <strong>Infraestructura Cloud</strong> lista para producción<br>
+                    • <strong>Contenedores Docker</strong> para despliegue consistente
+                </p>
+            </div>
+            <div class="slide-number">7/10</div>
+        </div>
+
+        <!-- Slide 8: Metodología -->
+        <div class="slide">
+            <div class="duoc-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Logo_DuocUC.svg/2560px-Logo_DuocUC.svg.png" alt="DuocUC Logo">
+            </div>
+            <h2>Metodología y Cronograma</h2>
+            <div style="display: flex; gap: 40px; align-items: flex-start; width: 100%; max-width: 1200px;">
+                <div style="flex: 1;">
+                    <h3>Metodología Ágil (Scrum)</h3>
+                    <div class="feature-card">
+                        <h4>🔄 Iteraciones Semanales</h4>
+                        <p>• Sprints de 1 semana<br>
+                        • Daily standups<br>
+                        • Sprint reviews<br>
+                        • Retrospectivas<br>
+                        • Roles especializados por área</p>
+                    </div>
+                </div>
+                <div style="flex: 1;">
+                    <h3>Fases del Proyecto</h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <strong>Fase 1:</strong> Análisis y Diseño (4 semanas)
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <strong>Fase 2:</strong> Desarrollo MVP (8 semanas)
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <strong>Fase 3:</strong> Testing y Deploy (6 semanas)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">8/10</div>
+        </div>
+
+        <!-- Slide 9: Impacto -->
+        <div class="slide">
+            <div class="duoc-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Logo_DuocUC.svg/2560px-Logo_DuocUC.svg.png" alt="DuocUC Logo">
+            </div>
+            <h2>Impacto Esperado</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-number">🎯</div>
+                    <h4>Mercado Objetivo</h4>
+                    <p>Región Metropolitana inicialmente, escalable a nivel nacional</p>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">💼</div>
+                    <h4>Competencias Aplicadas</h4>
+                    <p>Desarrollo Full-Stack, DevOps, UX/UI, Gestión de Proyectos</p>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">🚀</div>
+                    <h4>Escalabilidad</h4>
+                    <p>Arquitectura preparada para app móvil y crecimiento</p>
+                </div>
+            </div>
+            <div style="margin-top: 45px;">
+                <h3 style="text-align: center;">Beneficios del Proyecto</h3>
+                <div class="feature-grid" style="max-width: 1000px; margin: 0 auto;">
+                    <div class="feature-card">
+                        <h4>📈 Para la Economía Digital</h4>
+                        <p>Formalización de servicios independientes y creación de nuevas oportunidades laborales</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🎓 Para Nuestro Aprendizaje</h4>
+                        <p>Aplicación práctica de todas las competencias del perfil de egreso en un proyecto real</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">9/10</div>
+        </div>
+
+        <!-- Slide 10: Conclusiones -->
+        <div class="slide">
+            <div class="duoc-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Logo_DuocUC.svg/2560px-Logo_DuocUC.svg.png" alt="DuocUC Logo">
+            </div>
+            <h2>Conclusiones</h2>
+            <div class="solution-highlight" style="max-width: 950px;">
+                <h3>🎯 Proyecto Integral y Factible</h3>
+                <p><strong>Jobio</strong> representa una solución real a una problemática actual del mercado laboral chileno, implementada con tecnologías modernas y metodologías ágiles.</p>
+            </div>
+            
+            <div style="margin-top: 35px; max-width: 950px;">
+                <h3 style="text-align: center;">✅ Nuestros Compromisos</h3>
+                <p style="font-size: 1.35rem; text-align: center;">
+                    • <strong>Entrega MVP funcional</strong> con todas las características principales<br>
+                    • <strong>Código de calidad</strong> con tests y documentación completa<br>
+                    • <strong>Despliegue en producción</strong> listo para usuarios reales<br>
+                    • <strong>Escalabilidad futura</strong> hacia aplicación móvil
+                </p>
+            </div>
+
+            <div style="margin-top: 50px; text-align: center;">
+                <h3 style="font-size: 2.2rem;" class="highlight-text">¡Gracias por su atención!</h3>
+                <p style="font-size: 1.5rem; color: #64748b; margin-top: 20px;">¿Preguntas?</p>
+            </div>
+            <div class="slide-number">10/10</div>
+        </div>
+
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            if (direction === 1 && currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            } else if (direction === -1 && currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        // Initialize
+        showSlide(0);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (e.key === 'f' || e.key === 'F') {
+                // Fullscreen toggle
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                changeSlide(1); // Swipe left, go next
+            }
+            if (touchEndX > touchStartX + 50) {
+                changeSlide(-1); // Swipe right, go previous
+            }
+        }
+
+        // Progress indicator
+        function updateProgress() {
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.documentElement.style.setProperty('--progress', progress + '%');
+        }
+
+        // Auto-advance option (uncomment if needed)
+        // setInterval(() => {
+        //     if (currentSlide < totalSlides - 1) {
+        //         changeSlide(1);
+        //     }
+        // }, 30000); // 30 seconds per slide
+    </script>
+</body>
+</html>
